@@ -3,12 +3,8 @@
 from homeassistant.config_entries import ConfigEntryState
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up entry configured via user interface.
+    """Set up entry configured via user interface."""
 
-    :param hass: HomeAssistant: Home Assistant object
-    :param entry: ConfigEntry: Config Entry object
-    :return bool: Is success
-    """
     is_new: bool = get_config_value(entry, OPTION_IS_FROM_FLOW, False)
 
     if is_new:
@@ -31,14 +27,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     async def async_start(with_sleep: bool = False) -> None:
-        """Async start.
+        """Async start."""
 
-        :param with_sleep: bool
-        """
         if entry.state == ConfigEntryState.SETUP_IN_PROGRESS:
             await _updater.async_config_entry_first_refresh()
         else:
-            await _updater.async_update()  # Новый метод для обновления данных
+            await _updater.async_update()  # Используем новый метод
 
         if with_sleep:
             await asyncio.sleep(DEFAULT_SLEEP)
