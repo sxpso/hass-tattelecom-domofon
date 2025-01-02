@@ -340,7 +340,7 @@ class IntercomUpdater(DataUpdateCoordinator):
 
         async_dispatcher_send(self.hass, SIGNAL_CALL_STATE)
 
-       async def async_update(self):
+    async def async_update(self):
         """Update data when entry is already loaded."""
         # Логика обновления данных
         # Используем существующую логику из метода update
