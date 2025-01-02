@@ -1,36 +1,6 @@
 """Tattelecom Intercom custom integration."""
 
-from __future__ import annotations
-
-import asyncio
-import logging
-
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
-    CONF_SCAN_INTERVAL,
-    CONF_TIMEOUT,
-    CONF_TOKEN,
-    EVENT_HOMEASSISTANT_STOP,
-)
-from homeassistant.core import CALLBACK_TYPE, Event, HomeAssistant
-
-from .const import (
-    CONF_PHONE,
-    DEFAULT_CALL_DELAY,
-    DEFAULT_SCAN_INTERVAL,
-    DEFAULT_SLEEP,
-    DEFAULT_TIMEOUT,
-    DOMAIN,
-    OPTION_IS_FROM_FLOW,
-    PLATFORMS,
-    UPDATE_LISTENER,
-    UPDATER,
-)
-from .helper import get_config_value
-from .updater import IntercomUpdater
-
-_LOGGER = logging.getLogger(__name__)
-
+from homeassistant.config_entries import ConfigEntryState
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up entry configured via user interface.
@@ -39,7 +9,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     :param entry: ConfigEntry: Config Entry object
     :return bool: Is success
     """
-
     is_new: bool = get_config_value(entry, OPTION_IS_FROM_FLOW, False)
 
     if is_new:
@@ -66,8 +35,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         :param with_sleep: bool
         """
-
-        await _updater.async_config_entry_first_refresh()
+        if entry.state == ConfigEntryState.SETUP_IN_PROGRESS:
+            await _updater.async_config_entry_first_refresh()
+        else:
+            await _updater.async_update()  # Новый метод для обновления данных
 
         if with_sleep:
             await asyncio.sleep(DEFAULT_SLEEP)
@@ -92,35 +63,29 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     return True
 
-
 async def async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Update options for entry that was configured via user interface.
 
-    :param hass: HomeAssistant: Home Assistant object
-    :param entry: ConfigEntry: Config Entry object
+    :param hass: Home Assistant: Home Assistant object
+    :param entry: Config Entry: Config Entry object
     """
-
     if entry.entry_id not in hass.data[DOMAIN]:
         return
 
     await hass.config_entries.async_reload(entry.entry_id)
 
-
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Remove entry configured via user interface.
 
-    :param hass: HomeAssistant: Home Assistant object
-    :param entry: ConfigEntry: Config Entry object
+    :param hass: Home Assistant: Home Assistant object
+    :param entry: Config Entry: Config Entry object
     :return bool: Is success
     """
-
     if is_unload := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         _updater: IntercomUpdater = hass.data[DOMAIN][entry.entry_id][UPDATER]
         await _updater.async_stop()
 
-        _update_listener: CALLBACK_TYPE = hass.data[DOMAIN][entry.entry_id][
-            UPDATE_LISTENER
-        ]
+        _update_listener: CALLBACK_TYPE = hass.data[DOMAIN][entry.entry_id][UPDATE_LISTENER]
         _update_listener()
 
         hass.data[DOMAIN].pop(entry.entry_id)
