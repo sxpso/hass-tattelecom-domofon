@@ -340,6 +340,34 @@ class IntercomUpdater(DataUpdateCoordinator):
 
         async_dispatcher_send(self.hass, SIGNAL_CALL_STATE)
 
+       async def async_update(self):
+        """Update data when entry is already loaded."""
+        # Логика обновления данных
+        # Используем существующую логику из метода update
+        
+        if not self._is_first_update:
+            await asyncio.sleep(randint(1, 3) * 60)
+
+        self.code = codes.OK
+
+        _err: IntercomError | None = None
+
+        try:
+            await self._async_prepare(self.data)
+        except IntercomUnauthorizedError as _e:
+            raise ConfigEntryAuthFailed(_e) from _e
+        except IntercomError as _e:
+            _err = _e
+
+            self.code = codes.SERVICE_UNAVAILABLE
+
+        self.data[ATTR_UPDATE_STATE] = codes.is_error(self.code)
+
+        if self._is_first_update:
+            self._is_first_update = False
+
+        return self.data
+
 
 @dataclass
 class IntercomEntityDescription:
