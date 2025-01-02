@@ -2,7 +2,7 @@
   "domain": "tattelecom_intercom",
   "name": "Tattelecom Intercom / Таттелеком Домофон",
   "codeowners": [
-    "@ewGENIY16"
+    "@dmamontov"
   ],
   "config_flow": true,
   "dependencies": [
