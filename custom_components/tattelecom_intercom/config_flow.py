@@ -7,7 +7,7 @@ import logging
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_SCAN_INTERVAL, CONF_TIMEOUT, CONF_TOKEN
-from homeassistant.core import callback,HomeAssistant
+from homeassistant.core import callback, HomeAssistant
 from homeassistant.data_entry_flow import FlowHandler, FlowResult
 from homeassistant.helpers.httpx_client import get_async_client
 from homeassistant.helpers.typing import ConfigType
@@ -67,7 +67,11 @@ class IntercomFlow(FlowHandler):
             except IntercomNotFoundError:
                 return await self.async_step_register(user_input)
             except IntercomConnectionError:
-                errors = {"base": "connection.error"}
+                errors = {
+                    "base": "connection.error",
+                    "details": str(e),
+                    "timestamp": datetime.now().isoformat(),
+                }
             except IntercomError as err:
                 errors = {"base": str(err)}
             else:
@@ -313,9 +317,11 @@ class IntercomOptionsFlow(IntercomFlow, config_entries.OptionsFlow):
             self._client = IntercomClient(
                 get_async_client(self.hass, False),
                 int(user_input[CONF_PHONE]),
-                None
-                if _is_change_phone
-                else get_config_value(self._config_entry, CONF_TOKEN),
+                (
+                    None
+                    if _is_change_phone
+                    else get_config_value(self._config_entry, CONF_TOKEN)
+                ),
             )
 
             try:
