@@ -62,20 +62,8 @@ class IntercomFlow(FlowHandler):
                 get_async_client(self.hass, False), int(user_input[CONF_PHONE])
             )
 
-            try:
                 await self._client.signin()
-            except IntercomNotFoundError:
-                return await self.async_step_register(user_input)
-            except IntercomConnectionError:
-                errors = {
-                    "base": "connection.error",
-                    "details": str(e),
-                    "timestamp": datetime.now().isoformat(),
-                }
-            except IntercomError as err:
-                errors = {"base": str(err)}
-            else:
-                return await self.async_step_confirm(user_input)
+           
 
         return self.async_show_form(
             step_id="phone",
