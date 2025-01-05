@@ -62,8 +62,7 @@ class IntercomFlow(FlowHandler):
                 get_async_client(self.hass, False), int(user_input[CONF_PHONE])
             )
 
-                await self._client.signin()
-           
+            await self._client.signin()
 
         return self.async_show_form(
             step_id="phone",
