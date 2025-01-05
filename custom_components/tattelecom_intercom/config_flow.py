@@ -7,7 +7,7 @@ import logging
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_SCAN_INTERVAL, CONF_TIMEOUT, CONF_TOKEN
-from homeassistant.core import callback
+from homeassistant.core import callback,HomeAssistant
 from homeassistant.data_entry_flow import FlowHandler, FlowResult
 from homeassistant.helpers.httpx_client import get_async_client
 from homeassistant.helpers.typing import ConfigType

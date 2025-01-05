@@ -1,5 +1,7 @@
 """Tattelecom Intercom custom integration."""
 
+from homeassistant.core import HomeAssistant
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.config_entries import ConfigEntryState
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
