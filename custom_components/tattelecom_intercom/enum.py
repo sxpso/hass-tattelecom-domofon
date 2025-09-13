@@ -4,9 +4,7 @@
 
 from __future__ import annotations
 
-from enum import Enum, IntEnum
-
-from homeassistant.backports.enum import StrEnum
+from enum import Enum, IntEnum, StrEnum
 
 from custom_components.tattelecom_intercom.const import DOMAIN
 
